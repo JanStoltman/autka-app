@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="utilDialogHeight">150dp</dimen>
+    <dimen name="hoveringToolbarWidth">200dp</dimen>
+    <dimen name="lowElevation">8dp</dimen>
+    <dimen name="highElevation">12dp</dimen>
+    <dimen name="utilViewWidth">150dp</dimen>
+    <dimen name="utilViewHeight">130dp</dimen>
+</resources>

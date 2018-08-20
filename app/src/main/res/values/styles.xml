@@ -1,0 +1,26 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="VozillaSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/vozillaTint</item>
+        <item name="colorSwitchThumbNormal">@color/vozillaTint</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorForeground">@android:color/darker_gray</item>
+    </style>
+
+    <style name="TraficarSwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/traficarTint</item>
+        <item name="colorSwitchThumbNormal">@color/traficarTint</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:colorForeground">@android:color/darker_gray</item>
+    </style>
+
+</resources>

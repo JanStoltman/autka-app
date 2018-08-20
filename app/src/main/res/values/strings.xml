@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Carsharing</string>
+    <string name="generic_error_message">Error has occured</string>
+    <string name="vozillla">Vozillla</string>
+    <string name="traficar">Traficar</string>
+    <string name="filter_by_car_provider">Filter by car provider</string>
+</resources>
