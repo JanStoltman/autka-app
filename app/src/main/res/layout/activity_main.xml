@@ -35,12 +35,6 @@
         tools:alpha="1"
         tools:layout_height="200dp">
 
-        <ImageView
-            android:id="@+id/catImage"
-            android:layout_width="@dimen/utilViewWidth"
-            android:layout_height="@dimen/utilViewHeight"
-            android:visibility="gone" />
-
         <LinearLayout
             android:id="@+id/filterView"
             android:layout_width="@dimen/utilViewWidth"
@@ -48,7 +42,7 @@
             android:orientation="vertical"
             android:padding="8dp"
             android:gravity="center_vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <Switch
                 android:id="@+id/vozillaFilterSwitch"
@@ -118,13 +112,13 @@
                 android:background="@color/colorPrimary" />
 
             <ImageButton
-                android:id="@+id/catButton"
+                android:id="@+id/locationButton"
                 android:layout_width="66dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="@null"
-                android:onClick="onCatButtonClick"
-                android:src="@drawable/ic_cat_paw" />
+                android:onClick="onLocationButtonClick"
+                android:src="@drawable/ic_location" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

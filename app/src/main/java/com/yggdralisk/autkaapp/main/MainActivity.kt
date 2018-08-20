@@ -4,12 +4,12 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -48,7 +48,6 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         setContentView(R.layout.activity_main)
         attachOnClicks()
         presenter.onStart()
-
         fetchMap()
         if (checkLocationPermission().not()) {
             presenter.onLocationPermissionNotGranted()
@@ -60,10 +59,11 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         traficarFilterSwitch.setOnCheckedChangeListener { _, isChecked -> presenter.onTraficarSelectionChanged(isChecked) }
         RxView.clicks(filterButton).throttleFirst(ANIM_DURATION, TimeUnit.MILLISECONDS).subscribe { onFilterButtonClick(filterButton) }.addTo(subscriptions)
         RxView.clicks(refreshButton).throttleFirst(15, TimeUnit.SECONDS).subscribe { onRefreshButtonClick(refreshButton) }.addTo(subscriptions)
-        RxView.clicks(catButton).throttleFirst(ANIM_DURATION, TimeUnit.MILLISECONDS).subscribe { onCatButtonClick(catButton) }.addTo(subscriptions)
+        RxView.clicks(locationButton).throttleFirst(ANIM_DURATION, TimeUnit.MILLISECONDS).subscribe { onLocationButtonClick(locationButton) }.addTo(subscriptions)
     }
 
     override fun onDestroy() {
+        subscriptions.clear()
         presenter.onDestroy()
         super.onDestroy()
     }
@@ -78,6 +78,13 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
     override fun onMapReady(map: GoogleMap?) {
         presenter.onMapReady()
         this.map = map
+
+        map?.let {
+            it.uiSettings.isMyLocationButtonEnabled = false
+            it.uiSettings.isMapToolbarEnabled = false
+            it.uiSettings.isCompassEnabled = false
+            it.uiSettings.isIndoorLevelPickerEnabled = false
+        }
     }
 
     override fun fetchAndDisplayLatestLocation() {
@@ -88,13 +95,18 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
                         if (location != null) {
                             map?.let {
                                 it.isMyLocationEnabled = true
-                                val cameraUpdate = CameraUpdateFactory
-                                        .newLatLngZoom(LatLng(location.latitude, location.longitude), 15f)
-                                it.animateCamera(cameraUpdate)
+
+                                zoomToLocation(location, it)
                             }
                         }
                     }
         }
+    }
+
+    private fun zoomToLocation(location: Location, map: GoogleMap) {
+        val cameraUpdate = CameraUpdateFactory
+                .newLatLngZoom(LatLng(location.latitude, location.longitude), 15f)
+        map.animateCamera(cameraUpdate)
     }
 
     override fun checkLocationPermission(): Boolean =
@@ -151,11 +163,9 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         //TODO: add anim spinning
     }
 
-    fun onCatButtonClick(v: View) {
+    fun onLocationButtonClick(v: View) {
         //TODO: add squeeze anim
-        val location = IntArray(2)
-        v.getLocationOnScreen(location)
-        presenter.onCatButtonClick(location)
+        presenter.onLocationButtonClick()
     }
 
     override fun animateHoveringToolbarUp() {
@@ -197,33 +207,6 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         windowManager.defaultDisplay.getMetrics(metrics)
         return metrics.heightPixels
     }
-
-    override fun loadCatView(imageUrl: String) {
-        //TODO: make it faster and fix it ffs
-        Glide.with(this)
-                .load(imageUrl)
-                .into(catImage)
-    }
-
-    override fun showCatView() {
-        catImage.visibility = View.VISIBLE
-    }
-
-    override fun hideFilterView() {
-        filterView.visibility = View.GONE
-    }
-
-    override fun hideCatView() {
-        catImage.visibility = View.GONE
-    }
-
-    override fun showFilterView() {
-        filterView.visibility = View.VISIBLE
-    }
-
-    override fun isFilterViewVisible(): Boolean = filterView.visibility == View.VISIBLE
-
-    override fun isCatViewVisible(): Boolean = catImage.visibility == View.VISIBLE
 
     override fun isVozillaSwitchChecked(): Boolean = vozillaFilterSwitch.isChecked
 

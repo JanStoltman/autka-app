@@ -16,13 +16,6 @@ interface MainContract {
         fun getScreenHeight(): Int
         fun animateUtilViewHeightUp()
         fun animateUtilViewHeightDown()
-        fun showCatView()
-        fun hideFilterView()
-        fun loadCatView(imageUrl: String)
-        fun hideCatView()
-        fun showFilterView()
-        fun isFilterViewVisible(): Boolean
-        fun isCatViewVisible(): Boolean
         fun isVozillaSwitchChecked(): Boolean
         fun isTraficarSwitchChecked(): Boolean
     }
@@ -34,7 +27,7 @@ interface MainContract {
         fun onLocationPermissionDenied()
         fun onFilterButtonClick(locationOnScreen: IntArray)
         fun onRefreshButtonClick()
-        fun onCatButtonClick(locationOnScreen: IntArray)
+        fun onLocationButtonClick()
         fun onVozillaSelectionChanged(checked: Boolean)
         fun onTraficarSelectionChanged(checked: Boolean)
     }

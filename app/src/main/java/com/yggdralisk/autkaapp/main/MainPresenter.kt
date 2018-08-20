@@ -30,11 +30,6 @@ class MainPresenter(view: MainContract.View,
         view.requestLocationPermission()
     }
 
-    override fun onStart() {
-        super.onStart()
-        fetchAndLoadCatImage()
-    }
-
     override fun onMapReady() {
         view.fetchAndDisplayLatestLocation()
         fetchCars()
@@ -72,46 +67,15 @@ class MainPresenter(view: MainContract.View,
         return s
     }
 
-    override fun onFilterButtonClick(locationOnScreen: IntArray) {
-        val chosenAgain = view.isFilterViewVisible()
+    override fun onFilterButtonClick(locationOnScreen: IntArray) =
+            if (isHoveringToolbarDown(locationOnScreen)) {
+                showUtilView()
+            } else {
+                hideUtilView()
+            }
 
-        view.hideCatView()
-        view.showFilterView()
-
-        if (isHoveringToolbarDown(locationOnScreen)) {
-            showUtilView()
-        } else if (chosenAgain) {
-            hideUtilView()
-        }
-    }
-
-    override fun onCatButtonClick(locationOnScreen: IntArray) {
-        val chosenAgain = view.isCatViewVisible()
-
-        showCatImage()
-        fetchAndLoadCatImage()
-
-        if (isHoveringToolbarDown(locationOnScreen)) {
-            showUtilView()
-        } else if (chosenAgain) {
-            hideUtilView()
-        }
-    }
-
-    private fun fetchAndLoadCatImage() {
-        mainRepository.fetchCatPic().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    view.loadCatView(it)
-                }, {
-                    Timber.e(it)
-                    view.showError(it.message)
-                }).addTo(subscriptions)
-    }
-
-    private fun showCatImage() {
-        view.hideFilterView()
-        view.showCatView()
+    override fun onLocationButtonClick() {
+        view.fetchAndDisplayLatestLocation()
     }
 
     override fun onRefreshButtonClick() {
