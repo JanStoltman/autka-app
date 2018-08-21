@@ -22,6 +22,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import com.yggdralisk.autkaapp.R
 import com.yggdralisk.autkaapp.common.anim.HeightProperty
 import com.yggdralisk.autkaapp.data.network.model.CarModel
+import com.yggdralisk.autkaapp.data.network.model.Owner
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -141,11 +142,18 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         if (map != null) {
             map?.clear()
             cars?.let {
-                val carIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_car)
+                //Prepare bitmaps to avoid fetching them in a loop
+                val vozillaCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_vozilla_car)
+                val traficarCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_traficar_car)
+
                 for (car in it) {
                     map?.addMarker(MarkerOptions()
                             .position(LatLng(car.Latitude, car.Longitude))
-                            .icon(carIcon))
+                            .icon(if (car.Owner == Owner.TRAFICAR.ownerName) {
+                                traficarCarIcon
+                            } else {
+                                vozillaCarIcon
+                            }))
                 }
             }
         }
