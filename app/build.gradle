@@ -18,8 +18,8 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs{
-        release{
+    signingConfigs {
+        release {
             storeFile file("/root/android_keys_autka.jks")
             storePassword ""
             keyAlias "key0"
@@ -48,6 +48,7 @@ dependencies {
 
     implementation 'androidx.recyclerview:recyclerview:1.0.0-rc01'
     implementation 'androidx.cardview:cardview:1.0.0-rc01'
+    implementation 'com.google.android.material:material:1.0.0-rc01'
 
     // Dagger
     implementation "com.google.dagger:dagger:$DAGGER_VERSION"

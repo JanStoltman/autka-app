@@ -1,5 +1,6 @@
 package com.yggdralisk.autkaapp.main
 
+import com.google.android.gms.maps.model.Marker
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.mvp.BasePresenterInterface
 
@@ -18,6 +19,10 @@ interface MainContract {
         fun animateUtilViewHeightDown()
         fun isVozillaSwitchChecked(): Boolean
         fun isTraficarSwitchChecked(): Boolean
+        fun showDetailsView(car: CarModel)
+        fun hideBottomSheet()
+        fun carDetailsLayoutBehaviorIsHidden(): Boolean
+        fun isHoveringToolbarDown(): Boolean
     }
 
     interface Presenter : BasePresenterInterface {
@@ -30,5 +35,8 @@ interface MainContract {
         fun onLocationButtonClick()
         fun onVozillaSelectionChanged(checked: Boolean)
         fun onTraficarSelectionChanged(checked: Boolean)
+        fun onMarkerClick(marker: Marker?): Boolean
+        fun onBackPressed(): Boolean
+        fun onMapClick()
     }
 }

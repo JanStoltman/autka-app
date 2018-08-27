@@ -4,36 +4,39 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
+import android.widget.LinearLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jakewharton.rxbinding2.view.RxView
 import com.yggdralisk.autkaapp.R
 import com.yggdralisk.autkaapp.common.anim.HeightProperty
+import com.yggdralisk.autkaapp.common.extension.zoomToLatLng
+import com.yggdralisk.autkaapp.common.extension.zoomToLocation
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.data.network.model.Owner
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.bottom_sheet_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
-class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCallback {
+class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     companion object {
         private const val MY_PERMISSIONS_REQUEST_FINE_LOCATION = 1
         private const val ANIM_DURATION = 500L
@@ -43,10 +46,12 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
     lateinit var presenter: MainContract.Presenter
     var map: GoogleMap? = null
     private val subscriptions = CompositeDisposable()
+    private lateinit var carDetailsLayoutBehavior: BottomSheetBehavior<LinearLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        carDetailsLayoutBehavior = BottomSheetBehavior.from(carDetailsLayout)
         attachOnClicks()
         presenter.onStart()
         fetchMap()
@@ -54,6 +59,24 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
             presenter.onLocationPermissionNotGranted()
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        hideBottomSheet()
+    }
+
+    override fun onBackPressed() {
+        if (presenter.onBackPressed().not()) {
+            super.onBackPressed()
+        }
+    }
+
+    override fun hideBottomSheet() =
+            carDetailsLayoutBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
+
+    override fun carDetailsLayoutBehaviorIsHidden(): Boolean =
+            carDetailsLayoutBehavior.state == BottomSheetBehavior.STATE_HIDDEN
+
 
     private fun attachOnClicks() {
         vozillaFilterSwitch.setOnCheckedChangeListener { _, isChecked -> presenter.onVozillaSelectionChanged(isChecked) }
@@ -85,6 +108,10 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
             it.uiSettings.isMapToolbarEnabled = false
             it.uiSettings.isCompassEnabled = false
             it.uiSettings.isIndoorLevelPickerEnabled = false
+            it.setOnMarkerClickListener(this)
+            it.setOnMapClickListener {
+                presenter.onMapClick()
+            }
         }
     }
 
@@ -97,17 +124,11 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
                             map?.let {
                                 it.isMyLocationEnabled = true
 
-                                zoomToLocation(location, it)
+                                it.zoomToLocation(location)
                             }
                         }
                     }
         }
-    }
-
-    private fun zoomToLocation(location: Location, map: GoogleMap) {
-        val cameraUpdate = CameraUpdateFactory
-                .newLatLngZoom(LatLng(location.latitude, location.longitude), 15f)
-        map.animateCamera(cameraUpdate)
     }
 
     override fun checkLocationPermission(): Boolean =
@@ -142,28 +163,31 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         if (map != null) {
             map?.clear()
             cars?.let {
-                //Prepare bitmaps to avoid fetching them in a loop
                 val vozillaCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_vozilla_car)
                 val traficarCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_traficar_car)
 
                 for (car in it) {
                     map?.addMarker(MarkerOptions()
-                            .position(LatLng(car.Latitude, car.Longitude))
+                            .position(car.toLatLng())
                             .icon(if (car.Owner == Owner.TRAFICAR.ownerName) {
                                 traficarCarIcon
                             } else {
                                 vozillaCarIcon
-                            }))
+                            }))?.tag = car
                 }
             }
         }
     }
 
     fun onFilterButtonClick(v: View) {
+        presenter.onFilterButtonClick(getViewsLocationOnScreen(v))
+        //TODO: add anim reverse icon
+    }
+
+    private fun getViewsLocationOnScreen(v: View): IntArray {
         val location = IntArray(2)
         v.getLocationOnScreen(location)
-        presenter.onFilterButtonClick(location)
-        //TODO: add anim reverse icon
+        return location
     }
 
     fun onRefreshButtonClick(v: View) {
@@ -219,6 +243,22 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
     override fun isVozillaSwitchChecked(): Boolean = vozillaFilterSwitch.isChecked
 
     override fun isTraficarSwitchChecked(): Boolean = traficarFilterSwitch.isChecked
+
+    override fun onMarkerClick(marker: Marker?): Boolean = presenter.onMarkerClick(marker)
+
+    override fun showDetailsView(car: CarModel) {
+        map?.zoomToLatLng(car.toLatLng())
+        carDetailsLayoutBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        //TODO: Change
+        modelTV.text = car.Model
+        plateNumberTV.text = car.PlateNumber
+        sideNumberTV.text = car.SideNumber
+        rangeTV.text = car.RangeKm.toString() + "Km"
+    }
+
+    override fun isHoveringToolbarDown() =
+            getViewsLocationOnScreen(filterButton)[1] > (getScreenHeight() - getUtilDialogHeight())
 }
 
 //todo hide hover toolbar on back

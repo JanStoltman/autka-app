@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".main.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".main.MainActivity" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/utilView"
+        android:layout_width="@dimen/utilViewWidth"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:alpha="0"
+        android:animateLayoutChanges="true"
+        android:elevation="@dimen/lowElevation"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:alpha="1"
+        tools:layout_height="200dp">
+
+        <LinearLayout
+            android:id="@+id/filterView"
+            android:layout_width="@dimen/utilViewWidth"
+            android:layout_height="@dimen/utilViewHeight"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="visible">
+
+            <Switch
+                android:id="@+id/vozillaFilterSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:checked="true"
+                android:text="@string/vozillla"
+                android:theme="@style/VozillaSwitch" />
+
+            <Switch
+                android:id="@+id/traficarFilterSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/traficar"
+                android:theme="@style/TraficarSwitch" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/hoveringToolbar"
+        android:layout_width="@dimen/hoveringToolbarWidth"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/hoveringToolbarBackground"
+        android:elevation="@dimen/highElevation"
+        app:cardCornerRadius="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/filterButton"
+                android:layout_width="66dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:onClick="onFilterButtonClick"
+                android:src="@drawable/ic_filter" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/refreshButton"
+                android:layout_width="66dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:onClick="onRefreshButtonClick"
+                android:src="@drawable/ic_refresh" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/locationButton"
+                android:layout_width="66dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:onClick="onLocationButtonClick"
+                android:src="@drawable/ic_location" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

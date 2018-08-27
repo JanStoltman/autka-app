@@ -1,5 +1,7 @@
 package com.yggdralisk.autkaapp.main
 
+import com.google.android.gms.maps.model.Marker
+import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.data.network.model.Owner
 import com.yggdralisk.autkaapp.mvp.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -68,7 +70,7 @@ class MainPresenter(view: MainContract.View,
     }
 
     override fun onFilterButtonClick(locationOnScreen: IntArray) =
-            if (isHoveringToolbarDown(locationOnScreen)) {
+            if (view.isHoveringToolbarDown()) {
                 showUtilView()
             } else {
                 hideUtilView()
@@ -84,9 +86,6 @@ class MainPresenter(view: MainContract.View,
         }
     }
 
-    private fun isHoveringToolbarDown(locationOnScreen: IntArray) =
-            locationOnScreen[1] > (view.getScreenHeight() - view.getUtilDialogHeight())
-
     private fun hideUtilView() {
         view.animateHoveringToolbarDown()
         view.animateUtilViewHeightDown()
@@ -95,5 +94,32 @@ class MainPresenter(view: MainContract.View,
     private fun showUtilView() {
         view.animateHoveringToolbarUp()
         view.animateUtilViewHeightUp()
+    }
+
+    override fun onMarkerClick(marker: Marker?): Boolean =
+            if (marker == null || marker.tag !is CarModel) {
+                false
+            } else {
+                hideUtilView()
+                view.showDetailsView(marker.tag as CarModel)
+                true
+            }
+
+    override fun onBackPressed(): Boolean =
+            when {
+                view.isHoveringToolbarDown().not() -> {
+                    hideUtilView()
+                    true
+                }
+                view.carDetailsLayoutBehaviorIsHidden().not() -> {
+                    view.hideBottomSheet()
+                    true
+                }
+                else -> false
+            }
+
+    override fun onMapClick() {
+        view.hideBottomSheet()
+        hideUtilView()
     }
 }
