@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Carsharing</string>
+    <string name="generic_error_message">Wystąpił błąd</string>
+    <string name="filter_by_car_provider">"Filtruj według dostawcy "</string>
+    <string name="open_provider_app">Otwórz aplikację dostawcy</string>
+    <string name="provider_is_unknown">Dostawca nieznany</string>
+    <string name="plate_number">Numer rejestracyjny</string>
+    <string name="range">Zasięg</string>
+    <string name="side_number">Number boczny</string>
+    <string name="fuel">Paliwo</string>
+</resources>

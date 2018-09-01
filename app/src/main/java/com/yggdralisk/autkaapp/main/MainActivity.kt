@@ -14,20 +14,19 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jakewharton.rxbinding2.view.RxView
 import com.yggdralisk.autkaapp.R
 import com.yggdralisk.autkaapp.common.anim.HeightProperty
-import com.yggdralisk.autkaapp.common.extension.makeGone
-import com.yggdralisk.autkaapp.common.extension.makeVisible
-import com.yggdralisk.autkaapp.common.extension.zoomToLatLngFromTop
-import com.yggdralisk.autkaapp.common.extension.zoomToLocation
+import com.yggdralisk.autkaapp.common.extension.*
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.data.network.model.Owner
 import dagger.android.support.DaggerAppCompatActivity
@@ -118,6 +117,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
             it.uiSettings.isIndoorLevelPickerEnabled = false
             it.setOnMarkerClickListener(this)
             it.setOnMapClickListener { _ -> presenter.onMapClick() }
+            it.moveToWroclaw()
         }
     }
 

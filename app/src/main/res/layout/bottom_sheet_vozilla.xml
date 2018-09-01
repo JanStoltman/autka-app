@@ -25,12 +25,12 @@
         android:id="@+id/plateNumberTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/providerButton"
-        app:layout_constraintEnd_toStartOf="@+id/sideNumberTV"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toEndOf="@+id/plateNumberLabelTV"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/plateNumberLabelTV"
         tools:text="plateNumber" />
 
     <TextView
@@ -39,9 +39,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/providerButton"
-        app:layout_constraintEnd_toStartOf="@+id/rangeTV"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/plateNumberTV"
+        app:layout_constraintEnd_toEndOf="@+id/sideNumberLabelTV"
+        app:layout_constraintStart_toStartOf="@+id/sideNumberLabelTV"
         tools:text="sideNumber" />
 
     <TextView
@@ -50,9 +49,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/providerButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/sideNumberTV"
+        app:layout_constraintEnd_toEndOf="@+id/rangeLabelTV"
+        app:layout_constraintStart_toStartOf="@+id/rangeLabelTV"
         tools:text="150km" />
 
     <Button
@@ -70,12 +68,15 @@
         style="@style/DetailsLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:labelFor="@id/plateNumberTV"
         android:text="@string/plate_number"
         app:layout_constraintBottom_toTopOf="@+id/plateNumberTV"
-        app:layout_constraintEnd_toEndOf="@+id/plateNumberTV"
-        app:layout_constraintStart_toStartOf="@+id/plateNumberTV" />
+        app:layout_constraintEnd_toStartOf="@+id/sideNumberLabelTV"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/sideNumberLabelTV"
@@ -86,21 +87,24 @@
         android:labelFor="@id/plateNumberTV"
         android:text="@string/side_number"
         app:layout_constraintBottom_toTopOf="@+id/sideNumberTV"
-        app:layout_constraintEnd_toEndOf="@+id/sideNumberTV"
-        app:layout_constraintStart_toStartOf="@+id/sideNumberTV" />
+        app:layout_constraintEnd_toStartOf="@+id/rangeLabelTV"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/plateNumberLabelTV" />
 
     <TextView
         android:id="@+id/rangeLabelTV"
         style="@style/DetailsLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:labelFor="@id/plateNumberTV"
         android:text="@string/range"
         app:layout_constraintBottom_toTopOf="@+id/rangeTV"
-        app:layout_constraintEnd_toEndOf="@+id/rangeTV"
-        app:layout_constraintStart_toStartOf="@+id/rangeTV" />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/sideNumberLabelTV" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
