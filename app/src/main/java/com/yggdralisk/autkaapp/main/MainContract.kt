@@ -2,6 +2,7 @@ package com.yggdralisk.autkaapp.main
 
 import com.google.android.gms.maps.model.Marker
 import com.yggdralisk.autkaapp.data.network.model.CarModel
+import com.yggdralisk.autkaapp.data.network.model.Owner
 import com.yggdralisk.autkaapp.mvp.BasePresenterInterface
 
 interface MainContract {
@@ -23,6 +24,7 @@ interface MainContract {
         fun hideBottomSheet()
         fun carDetailsLayoutBehaviorIsHidden(): Boolean
         fun isHoveringToolbarDown(): Boolean
+        fun openProviderApp(owner: Owner)
     }
 
     interface Presenter : BasePresenterInterface {

@@ -23,4 +23,13 @@
         <item name="android:colorForeground">@android:color/darker_gray</item>
     </style>
 
+    <style name="ModelTextView">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DetailsLabel">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

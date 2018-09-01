@@ -4,4 +4,12 @@
     <string name="vozillla">Vozillla</string>
     <string name="traficar">Traficar</string>
     <string name="filter_by_car_provider">Filter by car provider</string>
+    <string name="km">%1$s Km</string>
+    <string name="l">%1$s l</string>
+    <string name="open_provider_app">Open provider\'s app</string>
+    <string name="provider_is_unknown">Provider is unknown</string>
+    <string name="plate_number">Plate number</string>
+    <string name="range">Range</string>
+    <string name="side_number">Side number</string>
+    <string name="fuel">Fuel</string>
 </resources>

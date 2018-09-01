@@ -7,7 +7,10 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
@@ -21,7 +24,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jakewharton.rxbinding2.view.RxView
 import com.yggdralisk.autkaapp.R
 import com.yggdralisk.autkaapp.common.anim.HeightProperty
-import com.yggdralisk.autkaapp.common.extension.zoomToLatLng
+import com.yggdralisk.autkaapp.common.extension.makeGone
+import com.yggdralisk.autkaapp.common.extension.makeVisible
+import com.yggdralisk.autkaapp.common.extension.zoomToLatLngFromTop
 import com.yggdralisk.autkaapp.common.extension.zoomToLocation
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.data.network.model.Owner
@@ -29,6 +34,9 @@ import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.bottom_sheet_main.*
+import kotlinx.android.synthetic.main.bottom_sheet_traficar.*
+import kotlinx.android.synthetic.main.bottom_sheet_unknown.*
+import kotlinx.android.synthetic.main.bottom_sheet_vozilla.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.contentView
 import org.jetbrains.anko.toast
@@ -109,9 +117,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
             it.uiSettings.isCompassEnabled = false
             it.uiSettings.isIndoorLevelPickerEnabled = false
             it.setOnMarkerClickListener(this)
-            it.setOnMapClickListener {
-                presenter.onMapClick()
-            }
+            it.setOnMapClickListener { _ -> presenter.onMapClick() }
         }
     }
 
@@ -165,14 +171,15 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
             cars?.let {
                 val vozillaCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_vozilla_car)
                 val traficarCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_traficar_car)
+                val unknownCarIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_unknown_car)
 
                 for (car in it) {
                     map?.addMarker(MarkerOptions()
                             .position(car.toLatLng())
-                            .icon(if (car.Owner == Owner.TRAFICAR.ownerName) {
-                                traficarCarIcon
-                            } else {
-                                vozillaCarIcon
+                            .icon(when {
+                                car.Owner == Owner.TRAFICAR.ownerName -> traficarCarIcon
+                                car.Owner == Owner.VOZILLA.ownerName -> vozillaCarIcon
+                                else -> unknownCarIcon
                             }))?.tag = car
                 }
             }
@@ -247,19 +254,71 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
     override fun onMarkerClick(marker: Marker?): Boolean = presenter.onMarkerClick(marker)
 
     override fun showDetailsView(car: CarModel) {
-        map?.zoomToLatLng(car.toLatLng())
+        map?.zoomToLatLngFromTop(car.toLatLng())
         carDetailsLayoutBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        //TODO: Change
-        modelTV.text = car.Model
-        plateNumberTV.text = car.PlateNumber
-        sideNumberTV.text = car.SideNumber
-        rangeTV.text = car.RangeKm.toString() + "Km"
+        when {
+            car.Owner == Owner.TRAFICAR.ownerName -> {
+                showTraficarDetailsView(car)
+            }
+            car.Owner == Owner.VOZILLA.ownerName -> {
+                showVozillaDetailsView(car)
+            }
+            else -> {
+                showUnknownDetailsView(car)
+            }
+        }
+    }
+
+    private fun showUnknownDetailsView(car: CarModel) {
+        changeBottomSheetsVisibility(unknownBottomSheet)
+        fillCommonInfo(unknownBottomSheet, car)
+    }
+
+    private fun showVozillaDetailsView(car: CarModel) {
+        changeBottomSheetsVisibility(vozillaBottomSheet)
+        fillCommonInfo(vozillaBottomSheet, car)
+
+        vozillaBottomSheet.findViewById<TextView>(R.id.rangeTV)?.text = getString(R.string.km, car.RangeKm.toString())
+        vozillaBottomSheet.findViewById<Button>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.VOZILLA) }
+    }
+
+    private fun showTraficarDetailsView(car: CarModel) {
+        changeBottomSheetsVisibility(traficarBottomSheet)
+        fillCommonInfo(traficarBottomSheet, car)
+
+        traficarBottomSheet.findViewById<TextView>(R.id.fuelTV)?.text = getString(R.string.l, car.Fuel.toString())
+        traficarBottomSheet.findViewById<Button>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.TRAFICAR) }
+    }
+
+    private fun changeBottomSheetsVisibility(visibleBottomSheet: ViewGroup) {
+        unknownBottomSheet.makeGone()
+        traficarBottomSheet.makeGone()
+        vozillaBottomSheet.makeGone()
+        visibleBottomSheet.makeVisible()
+    }
+
+    private fun fillCommonInfo(visibleBottomSheet: ViewGroup, car: CarModel) {
+        visibleBottomSheet.findViewById<TextView>(R.id.modelTV)?.text = car.Model
+        visibleBottomSheet.findViewById<TextView>(R.id.plateNumberTV)?.text = car.PlateNumber
+        visibleBottomSheet.findViewById<TextView>(R.id.sideNumberTV)?.text = car.SideNumber
+    }
+
+    override fun openProviderApp(owner: Owner) {
+        val launchIntent = when (owner) {
+            Owner.VOZILLA -> {
+                packageManager.getLaunchIntentForPackage("pl.techgarden.vozilla")
+            }
+            Owner.TRAFICAR -> {
+                packageManager.getLaunchIntentForPackage("pl.express.traficar")
+            }
+        }
+
+        if (launchIntent != null) {
+            startActivity(launchIntent)
+        }
     }
 
     override fun isHoveringToolbarDown() =
             getViewsLocationOnScreen(filterButton)[1] > (getScreenHeight() - getUtilDialogHeight())
 }
-
-//todo hide hover toolbar on back
-

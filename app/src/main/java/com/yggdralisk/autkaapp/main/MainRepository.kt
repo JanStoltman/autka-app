@@ -20,7 +20,6 @@ class MainRepository
     private var carsEmitter: Emitter<List<CarModel>>? = null
     private val carsDisposable = CompositeDisposable()
 
-    private var catCache: String? = null
     fun fetchCars(): Observable<List<CarModel>> =
             Observable.create { emitter ->
                 carsEmitter = emitter
@@ -34,7 +33,7 @@ class MainRepository
 
     private fun startCarPolling() = apiHelper
             .getCars()
-            //.repeatWhen { single -> single.delay(30, TimeUnit.SECONDS) }
+            .repeatWhen { single -> single.delay(30, TimeUnit.SECONDS) }
             .subscribe(::handleCars, ::handleFetchError)
             .addTo(carsDisposable)
 
@@ -52,16 +51,4 @@ class MainRepository
         carsCache.removeAndAddAll(cars)
         carsEmitter?.onNext(carsCache)
     }
-
-    fun fetchCatPic(): Single<String> =
-            if (catCache != null) {
-                Single.just(catCache)
-            } else {
-                apiHelper.getCatPic()
-                        .map { response -> response.file }
-                        .map {
-                            catCache = it
-                            it
-                        }
-            }
 }

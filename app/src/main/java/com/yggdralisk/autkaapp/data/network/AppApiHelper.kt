@@ -2,7 +2,6 @@ package com.yggdralisk.autkaapp.data.network
 
 import com.rx2androidnetworking.Rx2AndroidNetworking
 import com.yggdralisk.autkaapp.data.network.model.CarModel
-import com.yggdralisk.autkaapp.data.network.model.CatImageResponse
 import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,11 +25,5 @@ class AppApiHelper
                 .addHeaders(apiHeader)
                 .build()
                 .getObjectSingle(CarModel::class.java)
-    }
-
-    override fun getCatPic(): Single<CatImageResponse> {
-        return Rx2AndroidNetworking.get(ApiEndPoint.RANDOM_CAT_PIC)
-                .build()
-                .getObjectSingle(CatImageResponse::class.java)
     }
 }
