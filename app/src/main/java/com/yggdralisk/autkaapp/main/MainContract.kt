@@ -10,7 +10,7 @@ interface MainContract {
         fun fetchAndDisplayLatestLocation()
         fun checkLocationPermission(): Boolean
         fun requestLocationPermission()
-        fun showError(message: String?)
+        fun showError()
         fun displayCars(cars: List<CarModel>?)
         fun animateHoveringToolbarUp()
         fun animateHoveringToolbarDown()

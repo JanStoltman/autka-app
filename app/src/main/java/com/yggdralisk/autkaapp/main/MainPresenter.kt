@@ -7,11 +7,15 @@ import com.yggdralisk.autkaapp.mvp.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.doAsync
 import timber.log.Timber
 
 class MainPresenter(view: MainContract.View,
                     private val mainRepository: MainRepository) : BasePresenter<MainContract.View>(view), MainContract.Presenter {
+    override fun onDestroy() {
+        super.onDestroy()
+        mainRepository.stopFetch()
+    }
+
     override fun onVozillaSelectionChanged(checked: Boolean) {
         fetchCars()
     }
@@ -38,21 +42,32 @@ class MainPresenter(view: MainContract.View,
     }
 
     private fun fetchCars() {
-        mainRepository.fetchCars()
+        mainRepository.getCarsObservableAndStartPolling()
                 .map { cl ->
                     val owners = getActiveOwners()
-                    cl.filter { c ->
-                        c.Owner in owners
-                    }
+                    Pair(cl.first?.filter { c -> c.Owner in owners }, cl.second)
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    view.displayCars(it)
-                }, {
-                    Timber.e(it)
-                    view.showError(it.message)
-                }).addTo(subscriptions)
+                .subscribe(::handleCarsResult, ::handleFetchError)
+                .addTo(subscriptions)
+    }
+
+    private fun handleCarsResult(resultPair: Pair<List<CarModel>?, Throwable?>) {
+        if (resultPair.second == null) {
+            view.displayCars(resultPair.first)
+        } else {
+            handleFetchError(resultPair.second)
+        }
+    }
+
+    private fun handleFetchError(throwable: Throwable?) {
+        Timber.e(throwable)
+        view.showError()
+    }
+
+    override fun onRefreshButtonClick() {
+        mainRepository.refreshCars()
     }
 
     private fun getActiveOwners(): Set<String> {
@@ -78,12 +93,6 @@ class MainPresenter(view: MainContract.View,
 
     override fun onLocationButtonClick() {
         view.fetchAndDisplayLatestLocation()
-    }
-
-    override fun onRefreshButtonClick() {
-        doAsync {
-            mainRepository.refreshCars()
-        }
     }
 
     private fun hideUtilView() {

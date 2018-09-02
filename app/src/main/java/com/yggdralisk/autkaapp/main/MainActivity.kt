@@ -8,18 +8,15 @@ import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -159,9 +156,9 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         }
     }
 
-    override fun showError(message: String?) {
+    override fun showError() {
         contentView?.let {
-            toast(message ?: getString(R.string.generic_error_message))
+            toast(getString(R.string.generic_error_message))
         }
     }
 
@@ -188,7 +185,6 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
 
     fun onFilterButtonClick(v: View) {
         presenter.onFilterButtonClick(getViewsLocationOnScreen(v))
-        //TODO: add anim reverse icon
     }
 
     private fun getViewsLocationOnScreen(v: View): IntArray {
@@ -199,11 +195,9 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
 
     fun onRefreshButtonClick(v: View) {
         presenter.onRefreshButtonClick()
-        //TODO: add anim spinning
     }
 
     fun onLocationButtonClick(v: View) {
-        //TODO: add squeeze anim
         presenter.onLocationButtonClick()
     }
 
@@ -280,7 +274,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         fillCommonInfo(vozillaBottomSheet, car)
 
         vozillaBottomSheet.findViewById<TextView>(R.id.rangeTV)?.text = getString(R.string.km, car.RangeKm.toString())
-        vozillaBottomSheet.findViewById<Button>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.VOZILLA) }
+        vozillaBottomSheet.findViewById<View>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.VOZILLA) }
     }
 
     private fun showTraficarDetailsView(car: CarModel) {
@@ -288,7 +282,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         fillCommonInfo(traficarBottomSheet, car)
 
         traficarBottomSheet.findViewById<TextView>(R.id.fuelTV)?.text = getString(R.string.l, car.Fuel.toString())
-        traficarBottomSheet.findViewById<Button>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.TRAFICAR) }
+        traficarBottomSheet.findViewById<View>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.TRAFICAR) }
     }
 
     private fun changeBottomSheetsVisibility(visibleBottomSheet: ViewGroup) {
