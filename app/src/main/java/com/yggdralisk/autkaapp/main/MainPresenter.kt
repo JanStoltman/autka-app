@@ -4,9 +4,7 @@ import com.google.android.gms.maps.model.Marker
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import com.yggdralisk.autkaapp.data.network.model.Owner
 import com.yggdralisk.autkaapp.mvp.BasePresenter
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class MainPresenter(view: MainContract.View,
@@ -45,10 +43,8 @@ class MainPresenter(view: MainContract.View,
         mainRepository.getCarsObservableAndStartPolling()
                 .map { cl ->
                     val owners = getActiveOwners()
-                    Pair(cl.first?.filter { c -> c.Owner in owners }, cl.second)
+                    Pair(cl.first?.filter { c -> c.isOwnedByAnyOf(owners) }, cl.second)
                 }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(::handleCarsResult, ::handleFetchError)
                 .addTo(subscriptions)
     }
@@ -70,15 +66,15 @@ class MainPresenter(view: MainContract.View,
         mainRepository.refreshCars()
     }
 
-    private fun getActiveOwners(): Set<String> {
-        val s = hashSetOf<String>()
+    private fun getActiveOwners(): Set<Owner> {
+        val s = hashSetOf<Owner>()
 
         if (view.isVozillaSwitchChecked()) {
-            s.add(Owner.VOZILLA.ownerName)
+            s.add(Owner.VOZILLA)
         }
 
         if (view.isTraficarSwitchChecked()) {
-            s.add(Owner.TRAFICAR.ownerName)
+            s.add(Owner.TRAFICAR)
         }
 
         return s

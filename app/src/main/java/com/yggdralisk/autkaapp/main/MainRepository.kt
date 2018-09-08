@@ -5,8 +5,10 @@ import com.yggdralisk.autkaapp.common.extension.removeAndAddAll
 import com.yggdralisk.autkaapp.data.network.ApiHelper
 import com.yggdralisk.autkaapp.data.network.model.CarModel
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -44,11 +46,15 @@ class MainRepository
     private fun startCarPolling() = apiHelper
             .getCars()
             .repeatWhen { single -> single.delay(45, TimeUnit.SECONDS) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(::handleCars, ::handleFetchError)
             .addTo(carsDisposable)
 
     fun refreshCars() = apiHelper
             .getCars()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(::handleCars, ::handleFetchError)
             .addTo(carsDisposable)
 
@@ -64,7 +70,7 @@ class MainRepository
             recreateCarsPublishSubject()
         }
 
-        carsPublishSubject.onNext(Pair(carsCache, null))
+        carsPublishSubject.onNext(Pair(cars, null))
     }
 
     fun stopFetch() {

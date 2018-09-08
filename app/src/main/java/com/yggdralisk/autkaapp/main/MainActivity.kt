@@ -174,8 +174,8 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
                     map?.addMarker(MarkerOptions()
                             .position(car.toLatLng())
                             .icon(when {
-                                car.Owner == Owner.TRAFICAR.ownerName -> traficarCarIcon
-                                car.Owner == Owner.VOZILLA.ownerName -> vozillaCarIcon
+                                car.isOwnedBy(Owner.TRAFICAR) -> traficarCarIcon
+                                car.isOwnedBy(Owner.VOZILLA) -> vozillaCarIcon
                                 else -> unknownCarIcon
                             }))?.tag = car
                 }
@@ -252,10 +252,10 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         carDetailsLayoutBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         when {
-            car.Owner == Owner.TRAFICAR.ownerName -> {
+            car.isOwnedBy(Owner.TRAFICAR) -> {
                 showTraficarDetailsView(car)
             }
-            car.Owner == Owner.VOZILLA.ownerName -> {
+            car.isOwnedBy(Owner.VOZILLA) -> {
                 showVozillaDetailsView(car)
             }
             else -> {
@@ -273,7 +273,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         changeBottomSheetsVisibility(vozillaBottomSheet)
         fillCommonInfo(vozillaBottomSheet, car)
 
-        vozillaBottomSheet.findViewById<TextView>(R.id.rangeTV)?.text = getString(R.string.km, car.RangeKm.toString())
+        vozillaBottomSheet.findViewById<TextView>(R.id.rangeTV)?.text = getString(R.string.km, car.rangeKm.toString())
         vozillaBottomSheet.findViewById<View>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.VOZILLA) }
     }
 
@@ -281,7 +281,7 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
         changeBottomSheetsVisibility(traficarBottomSheet)
         fillCommonInfo(traficarBottomSheet, car)
 
-        traficarBottomSheet.findViewById<TextView>(R.id.fuelTV)?.text = getString(R.string.l, car.Fuel.toString())
+        traficarBottomSheet.findViewById<TextView>(R.id.fuelTV)?.text = getString(R.string.l, car.fuel.toString())
         traficarBottomSheet.findViewById<View>(R.id.providerButton)?.setOnClickListener { openProviderApp(Owner.TRAFICAR) }
     }
 
@@ -293,9 +293,9 @@ class MainActivity : DaggerAppCompatActivity(), MainContract.View, OnMapReadyCal
     }
 
     private fun fillCommonInfo(visibleBottomSheet: ViewGroup, car: CarModel) {
-        visibleBottomSheet.findViewById<TextView>(R.id.modelTV)?.text = car.Model
-        visibleBottomSheet.findViewById<TextView>(R.id.plateNumberTV)?.text = car.PlateNumber
-        visibleBottomSheet.findViewById<TextView>(R.id.sideNumberTV)?.text = car.SideNumber
+        visibleBottomSheet.findViewById<TextView>(R.id.modelTV)?.text = car.model
+        visibleBottomSheet.findViewById<TextView>(R.id.plateNumberTV)?.text = car.plateNumber
+        visibleBottomSheet.findViewById<TextView>(R.id.sideNumberTV)?.text = car.sideNumber
     }
 
     override fun openProviderApp(owner: Owner) {
